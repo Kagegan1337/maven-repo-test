@@ -1,9 +1,0 @@
-de\kagegan\api\TelefonApi.class
-de\kagegan\api\model\Anruf.class
-de\kagegan\api\model\AnrufStatus.class
-de\kagegan\api\model\Rufnummer.class
-de\kagegan\api\TelefonProvider.class
-de\kagegan\api\TelefonProviderRegistry.class
-de\kagegan\api\TelefonAutoConfiguration.class
-de\kagegan\api\TelefonProperties.class
-de\kagegan\Main.class
