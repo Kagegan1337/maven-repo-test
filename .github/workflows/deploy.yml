@@ -1,15 +1,69 @@
-name: Deploy
+name: Maven CI/CD
+
 on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  test:
+    name: Test
+    runs-on: [self-hosted, github-runner]
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Deploy
-        run: | 
-          echo "Deploying..."
-          mvn clean deploy
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run Maven verify
+        run: mvn verify
+
+  build:
+    name: Build
+    runs-on: [self-hosted, webserver]
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build Maven package
+        run: mvn clean package
+
+  deploy:
+    name: Deploy
+    runs-on: [self-hosted, webserver]
+    needs: build
+
+    # Deploy nur bei Push auf main, nicht bei Pull Requests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Deploy to Nexus
+        run: mvn deploy
