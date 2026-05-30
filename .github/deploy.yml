@@ -1,0 +1,20 @@
+deploy:
+  name: Deploy to Nexus
+  runs-on: github-runner
+  needs: build
+
+  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '21'
+        cache: maven
+
+    - name: Deploy to Nexus
+      run: mvn deploy
